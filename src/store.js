@@ -8,6 +8,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 
+const MEMORY = process.env.RH_MEMORY === '1' || process.env.VERCEL === '1';
+
 const DATA_DIR = process.env.RH_DATA_DIR || path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 
@@ -41,6 +43,7 @@ export function read() {
 }
 
 export function save() {
+  if (MEMORY) return cache; // serverless demo: state lives for the life of the instance
   fs.mkdirSync(DATA_DIR, { recursive: true });
   const tmp = `${DB_FILE}.${process.pid}.tmp`;
   fs.writeFileSync(tmp, JSON.stringify(cache, null, 2));

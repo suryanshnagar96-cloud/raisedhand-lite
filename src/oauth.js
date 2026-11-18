@@ -12,7 +12,15 @@ export const SCOPE = 'raisedhand';
 const ACCESS_TTL = 60 * 60 * 1000; // 1h
 const REFRESH_TTL = 30 * 24 * 60 * 60 * 1000; // 30d
 
+let baseOverride = null;
+
+/** Per-request override, so the same build works on localhost and on a host. */
+export function setBaseUrl(url) {
+  baseOverride = url ? String(url).replace(/\/$/, '') : null;
+}
+
 export const baseUrl = () =>
+  baseOverride ||
   (process.env.RH_BASE_URL || `http://localhost:${process.env.PORT || 4321}`).replace(/\/$/, '');
 
 export const authServerMetadata = () => ({

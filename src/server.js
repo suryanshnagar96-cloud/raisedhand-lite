@@ -25,6 +25,7 @@ import {
   exchangeCode,
   verifyBearer,
   consentPage,
+  setBaseUrl,
 } from './oauth.js';
 import { handleRpc } from './mcp.js';
 
@@ -33,6 +34,16 @@ const PUBLIC = path.join(HERE, '..', 'public');
 const PORT = Number(process.env.PORT || 4321);
 
 ensureSeeded();
+
+// Serverless demo: each cold instance seeds and runs once, so the dashboard is
+// never empty and every instance looks the same on first paint.
+if (process.env.VERCEL === '1' && !read().leads.length) {
+  try {
+    runDaily({ source: 'manual' });
+  } catch {
+    /* a demo prefill must never take the site down */
+  }
+}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -57,6 +68,17 @@ function json(res, status, body, headers = {}) {
 }
 
 async function body(req, limit = 1_000_000) {
+  // Serverless runtimes may have parsed the body already.
+  if (req.body !== undefined && req.body !== null) {
+    if (typeof req.body === 'string') {
+      try {
+        return JSON.parse(req.body);
+      } catch {
+        return Object.fromEntries(new URLSearchParams(req.body));
+      }
+    }
+    return req.body;
+  }
   const chunks = [];
   let size = 0;
   for await (const chunk of req) {
@@ -403,7 +425,12 @@ function serveStatic(req, res, pathname) {
   fs.createReadStream(file).pipe(res);
 }
 
-const server = http.createServer(async (req, res) => {
+export async function handler(req, res) {
+  // Public URL for OAuth metadata, whatever the host is.
+  const proto = req.headers['x-forwarded-proto'] || 'http';
+  const host = req.headers['x-forwarded-host'] || req.headers.host || `localhost:${PORT}`;
+  setBaseUrl(`${proto}://${host}`);
+
   const url = new URL(req.url, `http://localhost:${PORT}`);
   const pathname = decodeURIComponent(url.pathname);
 
@@ -419,11 +446,19 @@ const server = http.createServer(async (req, res) => {
     console.error(err);
     if (!res.headersSent) json(res, 500, { error: err.message });
   }
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`\n  Raised Hand Lite`);
-  console.log(`  dashboard   http://localhost:${PORT}`);
-  console.log(`  MCP         http://localhost:${PORT}/mcp`);
-  console.log(`  connect     claude mcp add --transport http raised-hand http://localhost:${PORT}/mcp\n`);
-});
+const server = http.createServer(handler);
+
+// Local: open a socket. On Vercel the platform invokes handler() directly, so we
+// must not listen (and must not block the function from returning).
+if (process.env.VERCEL !== '1') {
+  server.listen(PORT, () => {
+    console.log(`\n  Raised Hand Lite`);
+    console.log(`  dashboard   http://localhost:${PORT}`);
+    console.log(`  MCP         http://localhost:${PORT}/mcp`);
+    console.log(`  connect     claude mcp add --transport http raised-hand http://localhost:${PORT}/mcp\n`);
+  });
+}
+
+export default handler;

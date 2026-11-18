@@ -16,6 +16,10 @@ npm test           # 32 tests, node:test
 node scripts/smoke.mjs   # proves the OAuth → MCP handshake end to end
 ```
 
+**Live demo:** https://raisedhand-lite.vercel.app — press **Find leads now**.
+It runs on a serverless host with an in-memory store, so the demo data resets
+when the instance goes cold. Run it locally if you want state to persist.
+
 ![Live view](docs/live.png)
 
 ![Lead detail](docs/lead-detail.png)
@@ -210,6 +214,18 @@ must be a hard stop, `COO` must not match inside `Coordinator`, a stale lead mus
 score lower than a fresh one, the second run must not duplicate anyone, a reply
 must stop everything, PKCE must be enforced, a code must be single-use, and a
 spending tool must refuse without `confirm: true`.
+
+## Deploy
+
+Single Node process, no build step, no dependencies:
+
+```bash
+vercel deploy --prod      # this repo is already wired for it (vercel.json)
+```
+
+`RH_MEMORY=1` puts the store in memory (`VERCEL=1` does the same). Any host
+with a persistent disk can keep the JSON store by leaving both unset and
+pointing `RH_DATA_DIR` at a volume.
 
 ## Legal / ethical note
 
