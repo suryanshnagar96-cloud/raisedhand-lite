@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Unit tests
+        run: npm test
+      - name: Boot the server and run the MCP smoke test
+        run: |
+          node src/server.js &
+          for i in $(seq 1 30); do curl -sf http://localhost:4321/health && break; sleep 0.3; done
+          node scripts/smoke.mjs http://localhost:4321

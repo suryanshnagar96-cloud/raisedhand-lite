@@ -1,0 +1,27 @@
+{
+  "name": "raisedhand-lite",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A local, dependency-free prototype of a buying-signal lead engine with a remote MCP server.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node src/seed.js",
+    "reset": "node src/seed.js --reset",
+    "test": "node --test",
+    "run:daily": "node src/cli.js daily",
+    "run:leads": "node src/cli.js leads"
+  },
+  "keywords": [
+    "lead-generation",
+    "buying-signals",
+    "mcp",
+    "oauth",
+    "prototype"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raised Hand Lite — leads that raised their hand</title>
+<meta name="description" content="A local prototype of a buying-signal lead engine with a remote MCP server.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="hand">✋</span><span>Raised<b>Hand</b> <em>lite</em></span></div>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" data-tab="live" aria-selected="true">Live</button>
+    <button role="tab" data-tab="leads">Leads</button>
+    <button role="tab" data-tab="outreach">Outreach</button>
+    <button role="tab" data-tab="integrations">Integrations</button>
+    <button role="tab" data-tab="settings">Settings</button>
+  </nav>
+  <div class="spacer"></div>
+  <span class="pill" id="credits"><span class="dot"></span> <b>—</b> credits</span>
+  <button class="btn primary" id="run">Find leads now</button>
+</header>
+
+<main id="view"></main>
+
+<div class="drawer-wrap" id="drawerWrap" aria-hidden="true">
+  <div class="drawer" role="dialog" aria-modal="true" aria-label="Lead detail" id="drawer"></div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="/app.js" type="module"></script>
+</body>
+</html>
